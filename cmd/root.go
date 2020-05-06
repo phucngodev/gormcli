@@ -52,11 +52,14 @@ func init() {
 
 	pwd, _ := os.Getwd()
 	configFile := fmt.Sprintf("%s/config.yaml", pwd)
-	f, err := os.Create(configFile)
-	f.Close()
-	if err != nil {
-		log.Println("failed to get current working directory.")
-		os.Exit(1)
+	_, err := os.Stat(configFile)
+	if os.IsNotExist(err) {
+		f, err := os.Create(configFile)
+		f.Close()
+		if err != nil {
+			log.Println("failed to get current working directory.")
+			os.Exit(1)
+		}
 	}
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", configFile)
@@ -71,7 +74,7 @@ func initConfig() {
 	} else {
 		viper.AddConfigPath(".")
 		viper.SetConfigType("yaml")
-		viper.SetConfigName("config.yaml")
+		viper.SetConfigName("config")
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match

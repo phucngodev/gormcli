@@ -4,6 +4,8 @@ import (
 	"fmt"
 
 	migrate "github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/mysql"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
@@ -17,16 +19,16 @@ func InitMigrate() (*migrate.Migrate, error) {
 	var err error
 	var dbUri string
 	var m *migrate.Migrate
-	dbType := dbConfig["dialect"].(string)
+	dbType := dbConfig["dialect"]
 	switch dbType {
 	case "mysql":
-		dbUri = fmt.Sprintf("mysql//%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local&multiStatements=true", dbConfig["user"], dbConfig["password"], dbConfig["host"], dbConfig["port"], dbConfig["database"])
+		dbUri = fmt.Sprintf("mysql://%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local&multiStatements=true", dbConfig["user"], dbConfig["password"], dbConfig["host"], dbConfig["port"], dbConfig["database"])
 		m, err = migrate.New("file://migrations", dbUri)
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to created migration object")
 		}
 	case "postgres":
-		dbUri = fmt.Sprintf("postgres//%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True", dbConfig["user"], dbConfig["password"], dbConfig["host"], dbConfig["port"], dbConfig["database"])
+		dbUri = fmt.Sprintf("postgres://%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True", dbConfig["user"], dbConfig["password"], dbConfig["host"], dbConfig["port"], dbConfig["database"])
 		m, err = migrate.New("file://migrations", dbUri)
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to created migration object")
