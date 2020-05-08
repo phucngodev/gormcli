@@ -27,8 +27,8 @@ var dbType string
 // initCmd represents the init command
 var initCmd = &cobra.Command{
 	Use:   "init",
-	Short: "Initialize project using gorm in current directory",
-	Long:  "Initialize project using gorm in current directory",
+	Short: "Setup migration feature for current project",
+	Long:  "Setup migration feature for current project",
 	Run: func(cmd *cobra.Command, args []string) {
 		if dbType == "" {
 			dbType = "mysql"
@@ -45,7 +45,7 @@ var initCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		fmt.Println("GORM migration init successfully, run gorm --help form available commands.")
+		fmt.Println("Database migration init successfully, run gorm --help form available commands.")
 	},
 }
 

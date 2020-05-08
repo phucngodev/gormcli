@@ -26,6 +26,7 @@ import (
 
 // Migrate
 var version uint
+var force bool
 
 // dbCmd represents the db command
 var migrateCmd = &cobra.Command{
@@ -39,7 +40,19 @@ var migrateCmd = &cobra.Command{
 			os.Exit(1)
 		}
 		defer m.Close()
-		if version == 0 {
+
+		if force {
+			if version == 1 {
+				err = m.Down()
+			} else {
+				err = m.Force(int(version - 1))
+			}
+			if err != nil {
+				fmt.Printf("[Migrate] %s\n", err)
+			}
+		}
+
+		if version == 1 {
 			err = m.Up()
 		} else {
 			err = m.Migrate(version)
@@ -60,5 +73,6 @@ var migrateCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(migrateCmd)
-	migrateCmd.Flags().UintVarP(&version, "version", "v", 0, "migrate database up/down to version")
+	migrateCmd.Flags().UintVarP(&version, "version", "v", 1, "migrate database up/down to version")
+	migrateCmd.Flags().BoolVarP(&force, "force", "f", false, "Force sets a migration version. It does not check any currently active version in database. It resets the dirty state to false")
 }
